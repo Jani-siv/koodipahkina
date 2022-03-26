@@ -4,8 +4,10 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <vector>
+#include "../include/World.h"
 
-class Window {
+class Window :public World {
+
     public:
         Window(unsigned int win_width, unsigned int win_height);
         ~Window();
@@ -18,4 +20,5 @@ class Window {
         SDL_Renderer* gRenderer = NULL;
         unsigned int u_width;
         unsigned int u_height;
+        World world;
 };

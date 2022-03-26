@@ -4,6 +4,7 @@ Window::Window(unsigned int win_width,unsigned int win_height)
 {
  this->u_height = win_height;
  this->u_width = win_width;
+ this->world.createNodes();
 }
 
 Window::~Window()
