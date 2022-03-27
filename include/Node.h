@@ -8,6 +8,8 @@ class Node{
         void addEdges(std::list<int>edges);
         void returnEdges(std::list<int>&lista);
         int getName();
+        int getXcoord();
+        int getYcoord();
     private:
         int name;
         typedef struct coordinates{

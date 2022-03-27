@@ -1,10 +1,14 @@
 #include "../include/Window.h"
+#include <SDL2/SDL_pixels.h>
+#include <SDL2/SDL_render.h>
 
 Window::Window(unsigned int win_width,unsigned int win_height)
 {
  this->u_height = win_height;
  this->u_width = win_width;
  this->world.createNodes();
+ world.getEdgesCoordinates(this->edgeStartCoordinates,this->edgeEndCoordinates);
+ world.getNodesCoordinates(this->nodeCoordinates);
 }
 
 Window::~Window()
@@ -16,8 +20,55 @@ Window::~Window()
 void Window::initWindow()
 {
     this->makeWindow();
-    SDL_Delay(2000);
+    //test lines
+    this->drawEdges();
+    this->drawNodes();
+   SDL_RenderPresent(this->gRenderer);
+    SDL_Delay(6000);
 
+}
+
+void Window::drawNodes()
+{
+   SDL_SetRenderDrawColor(this->gRenderer,0xFF,0x00,0x00,SDL_ALPHA_OPAQUE);
+   for (auto it = this->nodeCoordinates.begin(); it != this->nodeCoordinates.end(); it++)
+   {
+       auto c = it->second.begin();
+      this->setNodeModel(c->first, c->second);
+   }
+ //  SDL_RenderPresent(this->gRenderer);
+}
+
+void Window::setNodeModel(int x, int y)
+{
+
+    SDL_RenderDrawPoint(this->gRenderer,x-1,y);
+    SDL_RenderDrawPoint(this->gRenderer,x+1,y);
+    SDL_RenderDrawPoint(this->gRenderer,x,y-1);
+    SDL_RenderDrawPoint(this->gRenderer,x,y+1);
+
+    SDL_RenderDrawPoint(this->gRenderer,x-2,y);
+    SDL_RenderDrawPoint(this->gRenderer,x+2,y);
+    SDL_RenderDrawPoint(this->gRenderer,x,y-2);
+    SDL_RenderDrawPoint(this->gRenderer,x,y+2);
+}
+
+void Window::drawEdges()
+{
+    auto itStart = this->edgeStartCoordinates.begin();
+    SDL_SetRenderDrawColor(this->gRenderer,0x00,0xFF,0x00,SDL_ALPHA_OPAQUE);
+    while (itStart != this->edgeStartCoordinates.end())
+    {
+        auto coordStart = itStart->second.begin();
+        auto itEnd = this->edgeEndCoordinates.find(itStart->first);
+        auto coordEnd = itEnd->second.begin();
+      int ret = SDL_RenderDrawLine(this->gRenderer,int(coordStart->first), int(coordStart->second), int(coordEnd->first), int(coordEnd->second));
+      if (ret < 0) {std::cout<<"error to set line"<<std::endl;}
+        std::cout<<"coord: "<<coordStart->first<<":"<<coordStart->second<<" "<<coordEnd->first<<":"<<coordEnd->second<<std::endl;
+    itStart++;
+    
+    }
+    //SDL_RenderPresent(this->gRenderer);
 }
 
 int Window::makeWindow()
@@ -40,7 +91,7 @@ int Window::makeWindow()
         return -1;
     }
     //color
-    SDL_SetRenderDrawColor(this->gRenderer, 0xFF,0xFF,0xFF,0xFF);
+    SDL_SetRenderDrawColor(this->gRenderer, 0x00,0x00,0x00,0x00);
     SDL_RenderClear(this->gRenderer);
     if (this->drawWindow() < 0)
     {

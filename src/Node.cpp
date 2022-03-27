@@ -26,3 +26,14 @@ int Node::getName()
 {
     return this->name;
 }
+
+int Node::getXcoord()
+{
+    return this->coord.x;
+}
+
+int Node::getYcoord()
+{
+    return this->coord.y;
+}
+
