@@ -16,15 +16,14 @@ World::~World()
 void World::jsonParser(std::string filename)
 {
     //open file
-    std::string line;
-    std::string directory = "./data/";
+    std::string line, comp, directory = "./data/";
     directory += filename;
     std::cout<<directory<<std::endl;
     std::ifstream inputfile(directory.c_str());
-  
-            size_t pos;
-        int nodeNum = 0;
-        bool firstNode = false;
+    std::list<int> edgeNumbers; 
+    size_t pos, lastpos;
+    bool firstNode = false;
+    int nodenumber, x, y, ed;
     if (inputfile.is_open())
     {
         std::cout<<"input file is open"<<std::endl;
@@ -34,40 +33,103 @@ void World::jsonParser(std::string filename)
             if (firstNode == false) 
             {
                 std::cout<<"trying find"<<std::endl;
-                std::string comp = "\"0\"";
+                comp = "\"0\"";
                 pos = line.find(comp);
-                std::cout<<line<<std::endl;
                 if (pos < line.length())
                 {
-                    std::cout<<"found: "<<line<<" from pos: "<<pos<<std::endl;
+                    nodenumber = stoi(line.substr(pos+1,1));        
                     std::getline(inputfile,line);
-                    pos = line.find("x");
-                    std::cout<<"found x: "<<pos<<std::endl;
+                    pos = line.find(":");
+                    x = stoi(line.substr(pos+2,(line.length()-pos-1)));
                     std::getline(inputfile,line);
-                    pos = line.find("y");
-                    std::cout<<"found y: "<<pos<<std::endl;
+                    pos = line.find(":");
+                    y = stoi(line.substr(pos+2,(line.length()-pos-1)));
                     std::getline(inputfile,line);
+                    while (pos < line.length())
+                    {
+                        std::getline(inputfile,line);
+                        pos = line.find("\"");
+                        lastpos = line.find_last_of("\"");
+                        if (pos > line.length())
+                        {
+                            break;
+                        }
+                        
+                        ed = stoi(line.substr(pos+1,(lastpos-pos-1)));
+                        std::cout<<"debug: "<<ed<<" "<<line<<std::endl;
+                        edgeNumbers.push_back(ed);
+                    }
                     std::getline(inputfile,line);
-                    pos = line.find("\"");
-                    std::cout<<"found edgepoint: "<<pos<<std::endl;
+                    this->createNodes(nodenumber, x, y, edgeNumbers);
+                    firstNode = true;
+                    edgeNumbers.clear();
                     std::getline(inputfile,line);
-                    pos = line.find("\"");
-                    std::cout<<"found edgepoint: "<<pos<<std::endl;
-                                       
-                firstNode = true;
                 }
             }
             if (firstNode == true)
             {
-            nodeNum++;
+                pos = line.find("\"");
+                lastpos = line.find_last_of("\"");
+                std::cout<<"test line: "<<line<<std::endl;
+                std::cout<<"test: "<<line.substr(pos+1,lastpos-pos-1)<<std::endl;
+                nodenumber = stoi(line.substr(pos+1,1));        
+                std::getline(inputfile,line);
+                pos = line.find(":");
+                x = stoi(line.substr(pos+2,(line.length()-pos-1)));
+                std::getline(inputfile,line);
+                pos = line.find(":");
+                y = stoi(line.substr(pos+2,(line.length()-pos-1)));
+                std::getline(inputfile,line);
+                while (pos < line.length())
+                {
+                    std::getline(inputfile,line);
+                    pos = line.find("\"");
+                    lastpos = line.find_last_of("\"");
+                    if (pos > line.length())
+                    {
+                        break;
+                    }
+                    ed = stoi(line.substr(pos+1,(lastpos-pos-1)));
+                    edgeNumbers.push_back(ed);
+                }
+
+                std::getline(inputfile,line);
+                this->createNodes(nodenumber, x, y, edgeNumbers);
+                std::cout<<"****DEBUG NODE NAME***"<<nodenumber<<std::endl;
+                std::cout<<"****DEBUG COORD****"<<x<<":"<<y<<std::endl;
+                std::cout<<"****DEBUG EDGE NAMES***"<<std::endl;
+                for (auto i = edgeNumbers.begin(); i != edgeNumbers.end(); i++)
+                {
+                    std::cout<<i.operator*()<<std::endl;
+                }
+                edgeNumbers.clear();
+                pos = line.find("},");
+                if (pos > line.length())
+                {
+                    std::cout<<"****DEBUG BREAK****"<<line<<std::endl;
+                    break;
+                }
             }
         }
     }
+    this->connectEdges();
+    std::cout<<"******NODES******"<<std::endl;
+    for ( auto i = this->nodes.begin(); i != this->nodes.end(); i++)
+    {
+        std::cout<<i->first<<std::endl;
+    }
+
 }
 
 
-void World::createNodes()
+void World::createNodes(int name, int x, int y, std::list<int> edgeNames)
 {
+    Node nod;
+    nod.addNode(name,x,y);
+    nod.addEdges(edgeNames);
+    this->createEdgesForContainer(edgeNames);
+    this->nodes[name] = nod;
+/*
     //read file to get node name, x, y
     Node nod0, nod1, nod2;
     nod0.addNode(0, 0, 0);
@@ -97,7 +159,6 @@ void World::createNodes()
     this->nodes[0] = nod0;
     this->nodes[1] = nod1;
     this->nodes[2] = nod2;
-
     //connect
     for (auto i = this->nodes.begin(); i != this->nodes.end(); i++)
     {
@@ -124,6 +185,49 @@ void World::createNodes()
     {
         std::cout<<"edge name: "<<i->first<<" Point A: "<<i->second.pointA<<" Point B: "<<i->second.pointB<<std::endl;
     }
+*/
+}
+
+void World::connectEdges()
+{
+//TO-DO edge connected test doesn't work 
+    for (auto i = this->nodes.begin(); i != this->nodes.end(); i++)
+    {
+        std::list<int> lista;
+        i->second.returnEdges(lista);
+        //debgu
+        std::cout<<"****DEBUG NODE LIST OF EDGES*****"<<std::endl;
+        for (auto k= lista.begin(); k != lista.end(); k++)
+        {
+            std::cout<<k.operator*()<<std::endl;
+        }
+        for (auto j = lista.begin(); j != lista.end(); j++)
+        {
+           auto it = this->edges.find(j.operator*());
+           if (it != this->edges.end())
+           {
+               if (it->second.connected == false)
+               {
+                    it->second.connected = true;
+                    it->second.pointA = i->second.getName();
+                    std::cout<<"****DEBUG EDGE NAME****"<<j.operator*()<<std::endl;
+                    std::cout<<"****DEBUG**** POINT A:"<<i->second.getName()<<std::endl;
+               }
+               else
+               {
+                   it->second.pointB = i->second.getName();
+                    std::cout<<"****DEBUG**** POINT B:"<<i->second.getName()<<std::endl;
+                std::cout<<"****DEBUG EDGE NAME****"<<j.operator*()<<std::endl;
+               }
+           }
+        }
+    }
+    for ( auto i = this->edges.begin(); i != this->edges.end(); i++)
+    {
+        std::cout<<i->first<<std::endl;
+     //   std::cout<<"edge name: "<<i->first<<" Point A: "<<i->second.pointA<<" Point B: "<<i->second.pointB<<std::endl;
+    }
+
 
 }
 

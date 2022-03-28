@@ -6,7 +6,7 @@ Window::Window(unsigned int win_width,unsigned int win_height)
 {
  this->u_height = win_height;
  this->u_width = win_width;
- this->world.createNodes();
+ this->world.jsonParser("test.json");
  world.getEdgesCoordinates(this->edgeStartCoordinates,this->edgeEndCoordinates);
  world.getNodesCoordinates(this->nodeCoordinates);
 }
