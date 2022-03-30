@@ -1,4 +1,5 @@
 #include "../include/World.h"
+#include <ios>
 #include <iterator>
 #include <sstream>
 #include <string>
@@ -23,7 +24,7 @@ void World::jsonParser(std::string filename)
     std::list<int> edgeNumbers; 
     size_t pos, lastpos;
     bool firstNode = false;
-    int nodenumber, x, y, ed;
+    int nodenumber, x, y, ed, deb = 0;
     if (inputfile.is_open())
     {
         std::cout<<"input file is open"<<std::endl;
@@ -56,7 +57,7 @@ void World::jsonParser(std::string filename)
                         }
                         
                         ed = stoi(line.substr(pos+1,(lastpos-pos-1)));
-                        std::cout<<"debug: "<<ed<<" "<<line<<std::endl;
+                       // std::cout<<"debug: "<<ed<<" "<<line<<std::endl;
                         edgeNumbers.push_back(ed);
                     }
                     std::getline(inputfile,line);
@@ -71,8 +72,8 @@ void World::jsonParser(std::string filename)
                 pos = line.find("\"");
                 lastpos = line.find_last_of("\"");
                 std::cout<<"test line: "<<line<<std::endl;
-                std::cout<<"test: "<<line.substr(pos+1,lastpos-pos-1)<<std::endl;
-                nodenumber = stoi(line.substr(pos+1,1));        
+              //  std::cout<<"test: "<<line.substr(pos+1,lastpos-pos-1)<<std::endl;
+                nodenumber = stoi(line.substr(pos+1,lastpos-pos));        
                 std::getline(inputfile,line);
                 pos = line.find(":");
                 x = stoi(line.substr(pos+2,(line.length()-pos-1)));
@@ -92,7 +93,7 @@ void World::jsonParser(std::string filename)
                     ed = stoi(line.substr(pos+1,(lastpos-pos-1)));
                     edgeNumbers.push_back(ed);
                 }
-
+                deb++;
                 std::getline(inputfile,line);
                 this->createNodes(nodenumber, x, y, edgeNumbers);
                 std::cout<<"****DEBUG NODE NAME***"<<nodenumber<<std::endl;
@@ -106,18 +107,19 @@ void World::jsonParser(std::string filename)
                 pos = line.find("},");
                 if (pos > line.length())
                 {
-                    std::cout<<"****DEBUG BREAK****"<<line<<std::endl;
+                 //   std::cout<<"****DEBUG BREAK****"<<line<<std::endl;
                     break;
                 }
-            }
+                }
         }
     }
+    std::cout<<"total rounds: "<<deb<<std::endl;
     this->connectEdges();
-    std::cout<<"******NODES******"<<std::endl;
-    for ( auto i = this->nodes.begin(); i != this->nodes.end(); i++)
-    {
-        std::cout<<i->first<<std::endl;
-    }
+    //std::cout<<"******NODES******"<<std::endl;
+   // for ( auto i = this->nodes.begin(); i != this->nodes.end(); i++)
+   // {
+     //   std::cout<<i->first<<std::endl;
+   // }
 
 }
 
@@ -196,6 +198,7 @@ void World::connectEdges()
         std::list<int> lista;
         i->second.returnEdges(lista);
         //debgu
+        std::cout<<"****DEBUG NODE NUM*****"<<i->second.getName()<<std::endl;
         std::cout<<"****DEBUG NODE LIST OF EDGES*****"<<std::endl;
         for (auto k= lista.begin(); k != lista.end(); k++)
         {
@@ -206,26 +209,28 @@ void World::connectEdges()
            auto it = this->edges.find(j.operator*());
            if (it != this->edges.end())
            {
+
+               std::cout<<"****DEBUG EDGE NAME****"<<j.operator*()<<std::endl;
+               std::cout<<"****DEBUG edge point boolan *****"<<it->second.connected<<std::endl;
+
                if (it->second.connected == false)
                {
                     it->second.connected = true;
                     it->second.pointA = i->second.getName();
-                    std::cout<<"****DEBUG EDGE NAME****"<<j.operator*()<<std::endl;
                     std::cout<<"****DEBUG**** POINT A:"<<i->second.getName()<<std::endl;
                }
                else
                {
                    it->second.pointB = i->second.getName();
                     std::cout<<"****DEBUG**** POINT B:"<<i->second.getName()<<std::endl;
-                std::cout<<"****DEBUG EDGE NAME****"<<j.operator*()<<std::endl;
                }
            }
         }
     }
     for ( auto i = this->edges.begin(); i != this->edges.end(); i++)
     {
-        std::cout<<i->first<<std::endl;
-     //   std::cout<<"edge name: "<<i->first<<" Point A: "<<i->second.pointA<<" Point B: "<<i->second.pointB<<std::endl;
+        //std::cout<<i->first<<std::endl;
+       // std::cout<<"edge name: "<<i->first<<" Point A: "<<i->second.pointA<<" Point B: "<<i->second.pointB<<std::endl;
     }
 
 

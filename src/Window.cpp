@@ -6,7 +6,7 @@ Window::Window(unsigned int win_width,unsigned int win_height)
 {
  this->u_height = win_height;
  this->u_width = win_width;
- this->world.jsonParser("test.json");
+ this->world.jsonParser("koodipahkina-data.json");
  world.getEdgesCoordinates(this->edgeStartCoordinates,this->edgeEndCoordinates);
  world.getNodesCoordinates(this->nodeCoordinates);
 }
@@ -104,7 +104,7 @@ int Window::makeWindow()
 
 int Window::drawWindow()
 {
-    SDL_Rect fillRect = {(int)this->u_width / 2, (int)this->u_height / 4, (int)this->u_width / 2, (int)this->u_height / 2};
+    SDL_Rect fillRect = {(int)this->u_width, (int)this->u_height, (int)this->u_width, (int)this->u_height};
     SDL_SetRenderDrawColor(this->gRenderer, 0xFF,0xFF,0xFF,0xFF);
     SDL_RenderFillRect( this->gRenderer, &fillRect);
     SDL_RenderPresent( this->gRenderer);
