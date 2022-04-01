@@ -10,7 +10,7 @@
 class Window :public World {
 
     public:
-        Window(unsigned int win_width, unsigned int win_height);
+        Window(const unsigned int& win_width, const unsigned int& win_height);
         ~Window();
         void initWindow();
     private:

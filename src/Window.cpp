@@ -2,10 +2,8 @@
 #include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_render.h>
 
-Window::Window(unsigned int win_width,unsigned int win_height)
+Window::Window(const unsigned int& win_width, const unsigned int& win_height) : u_width(win_width), u_height(win_height), world()
 {
- this->u_height = win_height;
- this->u_width = win_width;
  this->world.jsonParser("koodipahkina-data.json");
  world.getEdgesCoordinates(this->edgeStartCoordinates,this->edgeEndCoordinates);
  world.getNodesCoordinates(this->nodeCoordinates);
@@ -24,7 +22,7 @@ void Window::initWindow()
     this->drawEdges();
     this->drawNodes();
    SDL_RenderPresent(this->gRenderer);
-    SDL_Delay(6000);
+    SDL_Delay(10000);
 
 }
 
@@ -64,8 +62,10 @@ void Window::drawEdges()
         auto coordEnd = itEnd->second.begin();
       int ret = SDL_RenderDrawLine(this->gRenderer,int(coordStart->first), int(coordStart->second), int(coordEnd->first), int(coordEnd->second));
       if (ret < 0) {std::cout<<"error to set line"<<std::endl;}
-        std::cout<<"coord: "<<coordStart->first<<":"<<coordStart->second<<" "<<coordEnd->first<<":"<<coordEnd->second<<std::endl;
-    itStart++;
+#ifdef MY_DEBUG
+      std::cout<<"coord: "<<coordStart->first<<":"<<coordStart->second<<" "<<coordEnd->first<<":"<<coordEnd->second<<std::endl;
+#endif
+      itStart++;
     
     }
     //SDL_RenderPresent(this->gRenderer);

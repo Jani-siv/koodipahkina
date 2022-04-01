@@ -6,8 +6,6 @@
 
 World::World()
 {
-    std::cout<<"hello"<<std::endl;
-    this->jsonParser("test.json");
 }
 World::~World()
 {
@@ -71,7 +69,9 @@ void World::jsonParser(std::string filename)
             {
                 pos = line.find("\"");
                 lastpos = line.find_last_of("\"");
+#ifdef MY_DEBUG
                 std::cout<<"test line: "<<line<<std::endl;
+#endif
               //  std::cout<<"test: "<<line.substr(pos+1,lastpos-pos-1)<<std::endl;
                 nodenumber = stoi(line.substr(pos+1,lastpos-pos));        
                 std::getline(inputfile,line);
@@ -96,6 +96,7 @@ void World::jsonParser(std::string filename)
                 deb++;
                 std::getline(inputfile,line);
                 this->createNodes(nodenumber, x, y, edgeNumbers);
+#ifdef MY_DEBUG
                 std::cout<<"****DEBUG NODE NAME***"<<nodenumber<<std::endl;
                 std::cout<<"****DEBUG COORD****"<<x<<":"<<y<<std::endl;
                 std::cout<<"****DEBUG EDGE NAMES***"<<std::endl;
@@ -103,6 +104,7 @@ void World::jsonParser(std::string filename)
                 {
                     std::cout<<i.operator*()<<std::endl;
                 }
+#endif
                 edgeNumbers.clear();
                 pos = line.find("},");
                 if (pos > line.length())
@@ -113,7 +115,9 @@ void World::jsonParser(std::string filename)
                 }
         }
     }
+#ifdef MY_DEBUG
     std::cout<<"total rounds: "<<deb<<std::endl;
+#endif
     this->connectEdges();
     //std::cout<<"******NODES******"<<std::endl;
    // for ( auto i = this->nodes.begin(); i != this->nodes.end(); i++)
@@ -197,32 +201,38 @@ void World::connectEdges()
     {
         std::list<int> lista;
         i->second.returnEdges(lista);
-        //debgu
+#ifdef MY_DEBUG
         std::cout<<"****DEBUG NODE NUM*****"<<i->second.getName()<<std::endl;
         std::cout<<"****DEBUG NODE LIST OF EDGES*****"<<std::endl;
+
         for (auto k= lista.begin(); k != lista.end(); k++)
         {
             std::cout<<k.operator*()<<std::endl;
         }
+#endif
         for (auto j = lista.begin(); j != lista.end(); j++)
         {
            auto it = this->edges.find(j.operator*());
            if (it != this->edges.end())
            {
-
+#ifdef MY_DEBUG
                std::cout<<"****DEBUG EDGE NAME****"<<j.operator*()<<std::endl;
                std::cout<<"****DEBUG edge point boolan *****"<<it->second.connected<<std::endl;
-
+#endif
                if (it->second.connected == false)
                {
                     it->second.connected = true;
                     it->second.pointA = i->second.getName();
+#ifdef MY_DEBUG
                     std::cout<<"****DEBUG**** POINT A:"<<i->second.getName()<<std::endl;
+#endif
                }
                else
                {
                    it->second.pointB = i->second.getName();
-                    std::cout<<"****DEBUG**** POINT B:"<<i->second.getName()<<std::endl;
+#ifdef MY_DEBUG
+                   std::cout<<"****DEBUG**** POINT B:"<<i->second.getName()<<std::endl;
+#endif
                }
            }
         }

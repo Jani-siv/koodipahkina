@@ -5,6 +5,7 @@ project(Koodipahkina VERSION 0.01)
 #C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DMY_DEBUG")
 #include dir
 include_directories(include)
 file(GLOB SOURCES "src/*.cpp")
